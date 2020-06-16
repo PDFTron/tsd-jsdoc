@@ -661,16 +661,22 @@ export function createTypedef(doclet: ITypedefDoclet, children?: ts.Node[], altN
     ));
 }
 
-export function createEvent(doclet: IEventDoclet): ts.MethodDeclaration[]
+export function createEvent(doclets: IEventDoclet[]): ts.MethodDeclaration[]
 {
-    return [
-        createEventFunc(doclet, 'on'),
-        createEventFunc(doclet, 'one'),
-        createEventFunc(doclet, 'off', {
-            includeComments: false,
-            optionalParams: 'all',
-        }),
-    ];
+    let declarations: ts.MethodDeclaration[] = [];
+
+    doclets.forEach(doclet => {
+        declarations = declarations.concat([
+            createEventFunc(doclet, 'on'),
+            createEventFunc(doclet, 'one'),
+            createEventFunc(doclet, 'off', {
+                includeComments: false,
+                optionalParams: 'all',
+            }),
+        ])
+    })
+
+    return declarations;
 }
 
 type EventFuncName = 'on' | 'off' | 'one';

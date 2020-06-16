@@ -12,7 +12,8 @@ import {
     isEnumDoclet,
     isDefaultExportDoclet,
     isNamedExportDoclet,
-    isExportsAssignmentDoclet
+    isExportsAssignmentDoclet,
+    getParentEventDoclets
 } from './doclet_utils';
 import {
     createClass,
@@ -808,7 +809,13 @@ export class Emitter
                 return null;
 
             case 'event':
-                return createEvent(node.doclet);
+                let parentEventDoclets: IEventDoclet[] = [];
+                if (parent)
+                {
+                    parentEventDoclets = parentEventDoclets.concat(getParentEventDoclets(parent, this._treeNodes));
+                }
+
+                return createEvent([...parentEventDoclets, node.doclet]);
 
             default:
                 return assertNever(node.doclet);

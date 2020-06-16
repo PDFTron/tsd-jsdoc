@@ -161,4 +161,35 @@ function isExportsAssignmentDoclet(doclet, treeNodes) {
     return false;
 }
 exports.isExportsAssignmentDoclet = isExportsAssignmentDoclet;
+function getParentEventDoclets(node, treeNodes) {
+    let doclets = [];
+    if (node.doclet.kind !== 'class') {
+        return doclets;
+    }
+    const extensions = node.doclet.augments;
+    if (!extensions || extensions.length === 0) {
+        return doclets;
+    }
+    let parentClassNameStack = [];
+    parentClassNameStack = parentClassNameStack.concat(extensions);
+    while (parentClassNameStack.length) {
+        const parentClassName = parentClassNameStack.shift();
+        if (!parentClassName) {
+            continue;
+        }
+        const parentNode = treeNodes[parentClassName];
+        if (!parentNode || parentNode.doclet.kind !== 'class') {
+            continue;
+        }
+        if (parentNode.doclet.augments) {
+            parentClassNameStack = parentClassNameStack.concat(parentNode.doclet.augments);
+        }
+        const eventDoclets = parentNode.children
+            .filter((node) => node.doclet.kind === "event")
+            .map((node) => node.doclet);
+        doclets = doclets.concat(eventDoclets);
+    }
+    return doclets;
+}
+exports.getParentEventDoclets = getParentEventDoclets;
 //# sourceMappingURL=doclet_utils.js.map

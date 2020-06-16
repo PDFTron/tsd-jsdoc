@@ -387,15 +387,19 @@ function createTypedef(doclet, children, altName) {
     return handleComment(doclet, ts.createTypeAliasDeclaration(undefined, mods, buildName(doclet, altName), typeParams, type));
 }
 exports.createTypedef = createTypedef;
-function createEvent(doclet) {
-    return [
-        createEventFunc(doclet, 'on'),
-        createEventFunc(doclet, 'one'),
-        createEventFunc(doclet, 'off', {
-            includeComments: false,
-            optionalParams: 'all',
-        }),
-    ];
+function createEvent(doclets) {
+    let declarations = [];
+    doclets.forEach(doclet => {
+        declarations = declarations.concat([
+            createEventFunc(doclet, 'on'),
+            createEventFunc(doclet, 'one'),
+            createEventFunc(doclet, 'off', {
+                includeComments: false,
+                optionalParams: 'all',
+            }),
+        ]);
+    });
+    return declarations;
 }
 exports.createEvent = createEvent;
 ;

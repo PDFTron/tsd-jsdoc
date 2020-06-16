@@ -502,7 +502,11 @@ class Emitter {
             case 'file':
                 return null;
             case 'event':
-                return create_helpers_1.createEvent(node.doclet);
+                let parentEventDoclets = [];
+                if (parent) {
+                    parentEventDoclets = parentEventDoclets.concat(doclet_utils_1.getParentEventDoclets(parent, this._treeNodes));
+                }
+                return create_helpers_1.createEvent([...parentEventDoclets, node.doclet]);
             default:
                 return assert_never_1.assertNever(node.doclet);
         }

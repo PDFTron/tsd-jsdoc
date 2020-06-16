@@ -217,3 +217,51 @@ export function isExportsAssignmentDoclet(doclet: TDoclet, treeNodes: Dictionary
     }
     return false;
 }
+
+export function getParentEventDoclets(node: IDocletTreeNode, treeNodes: Dictionary<IDocletTreeNode>): IEventDoclet[]
+{
+    let doclets: IEventDoclet[] = [];
+
+    if (node.doclet.kind !== 'class')
+    {
+        return doclets;
+    }
+
+    // a string array that contains the class names that this doclet is inheriting
+    const extensions = node.doclet.augments;
+    if (!extensions || extensions.length === 0)
+    {
+        return doclets;
+    }
+
+    let parentClassNameStack: string[] = [];
+    parentClassNameStack = parentClassNameStack.concat(extensions);
+
+    while (parentClassNameStack.length)
+    {
+        const parentClassName = parentClassNameStack.shift();
+        if (!parentClassName)
+        {
+            continue;
+        }
+
+        const parentNode = treeNodes[parentClassName];
+        if (!parentNode || parentNode.doclet.kind !== 'class')
+        {
+            continue;
+        }
+
+        if (parentNode.doclet.augments)
+        {
+            parentClassNameStack = parentClassNameStack.concat(parentNode.doclet.augments);
+        }
+
+        const eventDoclets = parentNode.children
+            .filter((node) => node.doclet.kind === "event")
+            .map((node) => node.doclet as IEventDoclet);
+
+        doclets = doclets.concat(eventDoclets);
+    }
+
+    return doclets;
+}

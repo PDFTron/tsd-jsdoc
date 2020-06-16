@@ -1,4 +1,19 @@
 /**
+ * Creates a new instance of AnnotationHistoryManager.
+ * @class Represents an object that manages the Annotations history.
+ * @name AnnotationHistoryManager
+ * @extends AnnotationManager
+ */
+class AnnotationHistoryManager extends AnnotationManager {}
+
+/**
+ * Triggered when an annotation is removed by an undo action
+ * @name AnnotationHistoryManager#undo
+ * @event
+ * @param {object} annotation The annotation that was removed
+ */
+
+/**
  * Creates a new instance of AnnotationManager.
  * @class Represents an object that manages the Annotations that appear on a Document's pages when displayed in a DocumentViewer.
  * @name AnnotationManager
