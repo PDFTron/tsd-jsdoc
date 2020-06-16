@@ -29,6 +29,7 @@ import {
     createNamespace,
     createNamespaceMember,
     createTypedef,
+    createEvent,
 } from './create_helpers';
 import { generateTree, StringTreeNode, resolveTypeParameters } from './type_resolve_helpers';
 
@@ -656,11 +657,20 @@ export class Emitter
             const node = this._parseTreeNode(this._treeRoots[i]);
 
             if (node)
-                this.results.push(node);
+            {
+                if (Array.isArray(node))
+                {
+                    this.results.push(...node);
+                }
+                else
+                {
+                    this.results.push(node);
+                }
+            }
         }
     }
 
-    private _parseTreeNode(node: IDocletTreeNode, parent?: IDocletTreeNode): ts.Node | null
+    private _parseTreeNode(node: IDocletTreeNode, parent?: IDocletTreeNode): ts.Node | ts.Node[] | null
     {
         if (this.options.generationStrategy === 'exported' && !node.isExported)
         {
@@ -685,7 +695,16 @@ export class Emitter
                 const childNode = this._parseTreeNode(node.children[i], node);
 
                 if (childNode)
-                    children.push(childNode);
+                {
+                    if (Array.isArray(childNode))
+                    {
+                        children.push(...childNode);
+                    }
+                    else
+                    {
+                        children.push(childNode);
+                    }
+                }
             }
         }
 
@@ -718,7 +737,7 @@ export class Emitter
                     if (node.doclet.meta.code.value !== node.doclet.name)
                     {
                         const thisEmitter = this;
-                        let tsRes: ts.Node | null = null;
+                        let tsRes: ts.Node | ts.Node[] | null = null;
                         this._resolveDocletType(node.doclet.meta.code.value, node, function(refNode: IDocletTreeNode) {
                             // Named export from a type with a different name.
                             // Create a live IDocletTreeNode object with the `.exportName` attribute set.
@@ -789,8 +808,7 @@ export class Emitter
                 return null;
 
             case 'event':
-                // TODO: Handle Events.
-                return null;
+                return createEvent(node.doclet);
 
             default:
                 return assertNever(node.doclet);

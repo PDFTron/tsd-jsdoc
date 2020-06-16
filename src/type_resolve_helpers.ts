@@ -779,7 +779,7 @@ export function createTypeLiteral(children: IPropDesc[], parent?: IPropDesc): ts
     return node;
 }
 
-export function createFunctionParams(doclet: IFunctionDoclet | ITypedefDoclet | IClassDoclet): ts.ParameterDeclaration[]
+export function createFunctionParams(doclet: IFunctionDoclet | ITypedefDoclet | IClassDoclet | IEventDoclet): ts.ParameterDeclaration[]
 {
     const params: ts.ParameterDeclaration[] = [];
 

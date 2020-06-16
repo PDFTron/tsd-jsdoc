@@ -109,12 +109,20 @@ function expectJsDoc(fileName: string, generationStrategy: 'documented' | 'expor
  * @param basename Fixture file base name.
  */
 export function tsdJsdocTestCase(testName: string, basename: string, description?: string) {
+    tsdJsdocDocumentedTestCase(testName, basename, description);
+    tsdJsdocExportedTestCase(testName, basename, description);
+}
+
+export function tsdJsdocDocumentedTestCase(testName: string, basename: string, description?: string) {
     test(
         testName + ' '.repeat(40-testName.length) + '\'documented\' generation strategy     ' + (description ? description : ''),
         function() {
             expectJsDoc(basename, 'documented');
         }
     );
+}
+
+function tsdJsdocExportedTestCase(testName: string, basename: string, description?: string) {
     test(
         testName + ' '.repeat(40-testName.length) + '\'exported\' generation strategy       ' + (description ? description : ''),
         function() {

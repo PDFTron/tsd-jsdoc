@@ -660,3 +660,73 @@ export function createTypedef(doclet: ITypedefDoclet, children?: ts.Node[], altN
         type            // type
     ));
 }
+
+export function createEvent(doclet: IEventDoclet): ts.MethodDeclaration[]
+{
+    return [
+        createEventFunc(doclet, 'on'),
+        createEventFunc(doclet, 'one'),
+        createEventFunc(doclet, 'off', {
+            includeComments: false,
+            optionalParams: 'all',
+        }),
+    ];
+}
+
+type EventFuncName = 'on' | 'off' | 'one';
+interface EventFuncOptions {
+    optionalParams?: 'all' | 'last';
+    includeComments?: boolean;
+};
+
+
+function createEventFunc(
+    doclet: IEventDoclet,
+    funcName: EventFuncName,
+    options: EventFuncOptions = { includeComments: true }
+): ts.MethodDeclaration {
+    const params : ts.ParameterDeclaration[] = [];
+    const voidTypeNode = ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword);
+    const optionalParams = options.optionalParams;
+
+    const [ eventName ] = resolveOptionalFromName(doclet);
+    let questionToken = optionalParams === 'all' ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined;
+    params.push(ts.createParameter(
+        undefined,          // decorators
+        undefined,          // modifiers
+        undefined,          // dotDotDotToken
+        'event',            // name
+        questionToken,      // questionToken
+        resolveType({ names: [ `'${eventName}'` ] }),   // type
+        undefined           // initializer
+    ));
+
+    questionToken = optionalParams === 'all' || optionalParams === 'last' ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined;
+    params.push(ts.createParameter(
+        undefined,          // decorators
+        undefined,          // modifiers
+        undefined,          // dotDotDotToken
+        'callback',         // name
+        questionToken,      // questionToken
+        ts.createFunctionTypeNode(
+            undefined,      // typeParameters
+            createFunctionParams(doclet),   // parameters
+            voidTypeNode    // type
+        ),
+        undefined           // initializer
+    ));
+
+    const methodDeclaration = ts.createMethod(
+        undefined,          // decorators
+        [],                 // modifiers
+        undefined,          // asteriskToken
+        funcName,           // function name
+        undefined,          // questionToken
+        [],                 // typeParameters
+        params,             // parameters
+        voidTypeNode,       // return type
+        undefined           // body
+    );
+
+    return options.includeComments ? handleComment(doclet, methodDeclaration) : methodDeclaration;
+}
