@@ -29,7 +29,6 @@ npm-debug.log
 src/*.js
 *.js.map
 node_modules/
-dist/
 docs/
 out/
 test/_temp/
